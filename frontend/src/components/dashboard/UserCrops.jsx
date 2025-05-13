@@ -22,6 +22,7 @@ const UserCrops = () => {
   const fetchUserCrops = async () => {
     try {
       setLoading(true)
+      // Fetch user crops from the API latest data from backend
       const response = await axios.get(`${API_URL}/user-crops`)
       setUserCrops(response.data || [])
       setError(null)
@@ -52,6 +53,7 @@ const UserCrops = () => {
 
   const handleAddCrop = async (cropData) => {
     try {
+      // craete new crop in the backend
       const response = await axios.post(`${API_URL}/user-crops`, cropData)
       setUserCrops([...userCrops, response.data])
       navigate("/dashboard/crops")
@@ -63,6 +65,7 @@ const UserCrops = () => {
 
   const handleUpdateCrop = async (id, cropData) => {
     try {
+      // update crop in the backend
       const response = await axios.put(`${API_URL}/user-crops/${id}`, cropData)
       setUserCrops(userCrops.map((crop) => (crop._id === id ? response.data : crop)))
       navigate("/dashboard/crops")
@@ -106,6 +109,8 @@ const UserCrops = () => {
                   <th>Area</th>
                   <th>Planting Date</th>
                   <th>Expected Harvest</th>
+                  <th>Season</th> {/* change 3 */}
+                  <th>Water Level</th> {/* change 4 */}
                   <th>Status</th>
                   <th>Actions</th>
                 </tr>
@@ -117,6 +122,9 @@ const UserCrops = () => {
                     <td>{crop.area}</td>
                     <td>{crop.plantingDate}</td>
                     <td>{crop.harvestDate}</td>
+                    <td>{crop.season}</td> {/* change 5 */}
+                    <td>{crop.waterLevel}</td> {/* change 6 */}
+                    {/* change 7 */}
                     <td>
                       <span className={`status-badge ${crop.status.toLowerCase()}`}>{crop.status}</span>
                     </td>

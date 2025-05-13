@@ -86,7 +86,7 @@ const Navbar = () => {
             </li>
           )}
 
-          <li className="navbar-item dropdown" ref={infoDropdownRef}>
+          {/* <li className="navbar-item dropdown" ref={infoDropdownRef}>
             <a href="#" className="navbar-link" onClick={toggleInfoDropdown}>
               Information <i className={`fas fa-chevron-down ${infoDropdownOpen ? "rotate" : ""}`}></i>
             </a>
@@ -107,7 +107,7 @@ const Navbar = () => {
                 </Link>
               </li>
             </ul>
-          </li>
+          </li> */}
 
           <li className="navbar-item">
             <Link to="/contact" className="navbar-link" onClick={() => setMenuOpen(false)}>

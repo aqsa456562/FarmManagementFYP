@@ -1,88 +1,94 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { useParams, useNavigate } from "react-router-dom"
-import axios from "axios"
+import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import axios from "axios";
 
-const API_URL = "http://localhost:5000/api"
+const API_URL = "http://localhost:5000/api";
 
 const UserCropForm = ({ userCrops = [], onSubmit, isEditing = false }) => {
-  const { id } = useParams()
-  const navigate = useNavigate()
-  const [availableCrops, setAvailableCrops] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [submitting, setSubmitting] = useState(false)
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const [availableCrops, setAvailableCrops] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
 
   const [formData, setFormData] = useState({
     name: "",
     area: "",
     plantingDate: "",
     harvestDate: "",
+    season: "",
+    waterLevel: "", //change 1
     status: "Planned",
     notes: "",
-  })
+  });
 
   useEffect(() => {
     // Fetch available crops for dropdown
     const fetchAvailableCrops = async () => {
       try {
-        const response = await axios.get(`${API_URL}/crops`)
-        setAvailableCrops(response.data || [])
+        const response = await axios.get(`${API_URL}/crops`);
+        setAvailableCrops(response.data || []);
       } catch (error) {
-        console.error("Error fetching available crops:", error)
+        console.error("Error fetching available crops:", error);
         // For demo purposes, load from local data if API fails
         import("../../data/crops").then((module) => {
-          setAvailableCrops(module.default)
-        })
+          setAvailableCrops(module.default);
+        });
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    fetchAvailableCrops()
+    fetchAvailableCrops();
 
     // If editing, populate form with existing data
     if (isEditing && id) {
-      const cropToEdit = userCrops.find((crop) => crop._id?.toString() === id)
+      const cropToEdit = userCrops.find((crop) => crop._id?.toString() === id);
       if (cropToEdit) {
         setFormData({
           name: cropToEdit.name || "",
           area: cropToEdit.area || "",
           plantingDate: cropToEdit.plantingDate || "",
           harvestDate: cropToEdit.harvestDate || "",
+          season: cropToEdit.season || "",
+          waterLevel: cropToEdit.waterLevel || "", //change 2
           status: cropToEdit.status || "Planned",
           notes: cropToEdit.notes || "",
-        })
+        });
       }
     }
-  }, [isEditing, id, userCrops])
+  }, [isEditing, id, userCrops]);
 
   const handleChange = (e) => {
-    const { name, value } = e.target
+    const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
       [name]: value,
-    }))
-  }
+    }));
+  };
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    setSubmitting(true)
+    e.preventDefault();
+    setSubmitting(true);
     try {
       if (isEditing) {
-        await onSubmit(id, formData)
+        // Update existing crop or editing crop
+        await onSubmit(id, formData);
       } else {
-        await onSubmit(formData)
+        // Create new crop
+        await onSubmit(formData);
       }
     } catch (err) {
-      alert("Something went wrong while submitting!")
+      alert("Something went wrong while submitting!");
     } finally {
-      setSubmitting(false)
+      setSubmitting(false);
     }
-  }
+  };
 
   if (loading) {
-    return <div className="loading">Loading...</div>
+    return <div className="loading">Loading...</div>;
   }
 
   return (
@@ -103,21 +109,15 @@ const UserCropForm = ({ userCrops = [], onSubmit, isEditing = false }) => {
               required
             />
           ) : (
-            <select
+            <input
+              type="text"
               id="name"
-              name="name"
               value={formData.name}
-              onChange={handleChange}
               className="form-control"
+              onChange={handleChange}
+              name="name"
               required
-            >
-              <option value="">Select a crop</option>
-              {availableCrops.map((crop) => (
-                <option key={crop.id} value={crop.name}>
-                  {crop.name}
-                </option>
-              ))}
-            </select>
+            />
           )}
         </div>
 
@@ -160,7 +160,32 @@ const UserCropForm = ({ userCrops = [], onSubmit, isEditing = false }) => {
             required
           />
         </div>
-
+        <div className="form-group">
+          <label htmlFor="season">Season</label>
+          <select
+            id="season"
+            value={formData.season}
+            name="season"
+            onChange={handleChange}
+            className="form-control"
+          >
+            <option value="Monson">Monson</option>
+            <option value="Spring">Spring</option>
+            <option value="Rabi">Rabi</option>
+          </select>
+        </div>
+        <div className="form-group">
+          <label htmlFor="waterLevel">waterLevel</label>
+          <input
+            type="text"
+            id="waterLevel"
+            name="waterLevel"
+            value={formData.waterLevel}
+            onChange={handleChange}
+            className="form-control"
+            required
+          />
+        </div>
         <div className="form-group">
           <label htmlFor="status">Status</label>
           <select
@@ -191,16 +216,24 @@ const UserCropForm = ({ userCrops = [], onSubmit, isEditing = false }) => {
         </div>
 
         <div className="form-buttons">
-          <button type="button" onClick={() => navigate("/dashboard/crops")} className="btn btn-secondary">
+          <button
+            type="button"
+            onClick={() => navigate("/dashboard/crops")}
+            className="btn btn-secondary"
+          >
             Cancel
           </button>
           <button type="submit" className="btn" disabled={submitting}>
-            {submitting ? "Submitting..." : isEditing ? "Update Crop" : "Add Crop"}
+            {submitting
+              ? "Submitting..."
+              : isEditing
+              ? "Update Crop"
+              : "Add Crop"}
           </button>
         </div>
       </form>
     </div>
-  )
-}
+  );
+};
 
-export default UserCropForm
+export default UserCropForm;

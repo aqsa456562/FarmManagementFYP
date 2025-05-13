@@ -55,7 +55,7 @@ const Register = () => {
      
       const success = await register({ fullName, email, password, confirmPassword, farmType, location })
       if (success) {
-        navigate("/dashboard")
+        navigate("/login") // change 2
       }
     } catch (err) {
       setError("Failed to create an account")

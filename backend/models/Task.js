@@ -6,6 +6,7 @@ const TaskSchema = new mongoose.Schema({
   dueDate: { type: String, required: true },
   priority: { type: String, enum: ["High", "Medium", "Low"], required: true },
   completed: { type: Boolean, default: false },
+  notes: { type: String, required: true },
   description: { type: String },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },

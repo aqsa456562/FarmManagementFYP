@@ -43,9 +43,9 @@ export const AuthProvider = ({ children }) => {
       const response = await axios.post(`${API_URL}/auth/register`, userData)
 
       if (response.data.success) {
-        const newUser = response.data.user
-        setCurrentUser(newUser)
-        localStorage.setItem("user", JSON.stringify(newUser))
+        // const newUser = response.data.user    // change 1
+        // setCurrentUser(newUser) 
+        // localStorage.setItem("user", JSON.stringify(newUser))
         return true
       }
       return false

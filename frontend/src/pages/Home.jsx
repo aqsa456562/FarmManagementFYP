@@ -33,21 +33,21 @@ const Home = () => {
   // Sample data for featured crops
   const featuredCrops = [
     {
-      image: "/crops/wheat.jpg",
+      image: "/public/img/wheat.webp",
       name: "Wheat",
       season: "Winter",
       duration: "4-5 months",
       description: "A staple grain crop with high nutritional value and versatile uses in food production.",
     },
     {
-      image: "/crops/rice.jpg",
+      image: "/public/img/rice.webp",
       name: "Rice",
       season: "Monsoon",
       duration: "3-4 months",
       description: "One of the most consumed food crops worldwide, thriving in wet and humid conditions.",
     },
     {
-      image: "/crops/corn.jpg",
+      image: "/public/img/corn.avif",
       name: "Corn",
       season: "Spring-Summer",
       duration: "3-5 months",
@@ -58,21 +58,21 @@ const Home = () => {
   // Sample data for latest news
   const latestNews = [
     {
-      image: "/news/news1.jpg",
+      image: "/public/img/crop.avif",
       title: "New Drought-Resistant Crop Varieties Released",
       date: "June 15, 2023",
       summary:
         "Scientists have developed new crop varieties that can withstand prolonged drought conditions, offering hope for farmers in arid regions.",
     },
     {
-      image: "/news/news2.jpg",
+      image: "/public/img/organic.avif",
       title: "Government Announces Subsidy for Organic Farming",
       date: "June 10, 2023",
       summary:
         "The agriculture ministry has announced a new subsidy program to encourage farmers to transition to organic farming methods.",
     },
     {
-      image: "/news/news3.jpg",
+      image: "/public/img/tech.avif",
       title: "Agricultural Tech Conference Coming Next Month",
       date: "June 5, 2023",
       summary:

@@ -6,6 +6,8 @@ const UserCropSchema = new mongoose.Schema({
   area: { type: String, required: true },
   plantingDate: { type: String, required: true },
   harvestDate: { type: String, required: true },
+  season: { type: String, required: true },
+  waterLevel:{ type: String, required: true }, //change 3 backend
   status: { type: String, enum: ["Planned", "Growing", "Harvested"], required: true },
   notes: { type: String },
   createdAt: { type: Date, default: Date.now },

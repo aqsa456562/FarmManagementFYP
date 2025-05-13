@@ -32,6 +32,17 @@ const marketTrends = {
     { id: 8, crop: "Tomato", currentPrice: 350, previousPrice: 300, change: 16.7, trend: "up" },
     { id: 9, crop: "Apple", currentPrice: 580, previousPrice: 520, change: 11.5, trend: "up" },
   ],
+  annually: [
+    { id: 1, crop: "Wheat", currentPrice: 320, previousPrice: 270, change: 18.5, trend: "up" },
+    { id: 2, crop: "Rice", currentPrice: 450, previousPrice: 410, change: 9.8, trend: "up" },
+    { id: 3, crop: "Corn", currentPrice: 280, previousPrice: 250, change: 12.0, trend: "up" },
+    { id: 4, crop: "Soybean", currentPrice: 520, previousPrice: 450, change: 15.6, trend: "up" },
+    { id: 5, crop: "Cotton", currentPrice: 180, previousPrice: 210, change: -14.3, trend: "down" },
+    { id: 6, crop: "Sugarcane", currentPrice: 110, previousPrice: 90, change: 22.2, trend: "up" },
+    { id: 7, crop: "Potato", currentPrice: 220, previousPrice: 240, change: -8.3, trend: "down" },
+    { id: 8, crop: "Tomato", currentPrice: 350, previousPrice: 300, change: 16.7, trend: "up" },
+    { id: 9, crop: "Apple", currentPrice: 580, previousPrice: 520, change: 11.5, trend: "up" },
+  ],
 }
 
 export default marketTrends

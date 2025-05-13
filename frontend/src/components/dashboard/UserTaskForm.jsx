@@ -13,6 +13,7 @@ const UserTaskForm = ({ tasks = [], onSubmit, isEditing = false }) => {
     priority: "Medium",
     completed: false,
     description: "",
+    notes: "",
   })
 
   useEffect(() => {
@@ -31,6 +32,7 @@ const UserTaskForm = ({ tasks = [], onSubmit, isEditing = false }) => {
           priority: taskToEdit.priority || "Medium",
           completed: taskToEdit.completed || false,
           description: taskToEdit.description || "",
+          notes: taskToEdit.notes || "",
         })
       }
     }
@@ -128,7 +130,18 @@ const UserTaskForm = ({ tasks = [], onSubmit, isEditing = false }) => {
             placeholder="Add any details about this task..."
           ></textarea>
         </div>
-
+        <div className="form-group">
+          <label htmlFor="notes">notes</label>
+          <textarea
+            id="notes"
+            name="notes"
+            value={formData.notes}
+            onChange={handleChange}
+            className="form-control"
+            rows="4"
+            placeholder="Add any details about this task..."
+          ></textarea>
+        </div>
         <div className="form-buttons">
           <button type="button" onClick={() => navigate("/dashboard/tasks")} className="btn btn-secondary">
             Cancel

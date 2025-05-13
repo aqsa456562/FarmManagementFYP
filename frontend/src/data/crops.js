@@ -20,7 +20,7 @@ const crops = [
       "Wheat is ready to harvest when the stalks and heads turn from green to golden yellow and the kernels are hard. Use a combine harvester for large fields or cut by hand for small plots.",
     pests:
       "Common pests include aphids, armyworms, and Hessian flies. Diseases include rust, powdery mildew, and Fusarium head blight.",
-    images: ["/crops/wheat.jpg", "/crops/wheat-field.jpg", "/crops/wheat-harvest.jpg"],
+    images: ["https://tse4.mm.bing.net/th/id/OIP.leUcEChYZIbEsnNYuhNvmAHaE8?rs=1&pid=ImgDetMain", "/crops/wheat-field.jpg", "/crops/wheat-harvest.jpg"],
   },
   {
     id: 2,

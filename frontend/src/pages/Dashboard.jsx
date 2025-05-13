@@ -9,7 +9,6 @@ import "./Dashboard.css"
 import DashboardOverview from "../components/dashboard/DashboardOverview"
 import UserCrops from "../components/dashboard/UserCrops"
 import UserTasks from "../components/dashboard/UserTasks"
-import UserReports from "../components/dashboard/UserReports"
 
 const API_URL = "http://localhost:5000/api"
 
@@ -65,19 +64,12 @@ const Dashboard = () => {
           >
             Tasks
           </button>
-          <button
-            className={`dashboard-tab ${activeTab === "reports" ? "active" : ""}`}
-            onClick={() => handleTabClick("reports")}
-          >
-            Reports
-          </button>
         </div>
 
         <Routes>
           <Route path="/" element={<DashboardOverview />} />
           <Route path="/crops/*" element={<UserCrops />} />
           <Route path="/tasks/*" element={<UserTasks />} />
-          <Route path="/reports" element={<UserReports />} />
         </Routes>
       </div>
     </div>

@@ -17,7 +17,7 @@ app.use(cors(corsOptions));
 
 // Connect to MongoDB
 mongoose
-  .connect("mongodb+srv://hello:hello123@restaurant.8j8yw.mongodb.net/farm")
+  .connect("mongodb+srv://farmingFYP:1234@cluster0.nxj4i1j.mongodb.net/farmingFYP")
   .then(() => {
     console.log("MongoDB Connected");
   })

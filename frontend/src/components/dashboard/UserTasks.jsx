@@ -118,6 +118,7 @@ const UserTasks = () => {
                   <th>Due Date</th>
                   <th>Priority</th>
                   <th>Status</th>
+                  <th>Notes</th>
                   <th>Actions</th>
                 </tr>
               </thead>
@@ -140,6 +141,7 @@ const UserTasks = () => {
                         {task.completed ? "Completed" : "Pending"}
                       </label>
                     </td>
+                    <td>{task.notes}</td>
                     <td>
                       <div className="action-buttons">
                         <button
