@@ -66,25 +66,24 @@ const Navbar = () => {
             </Link>
           </li>
 
-          {currentUser && (
-            <li className="navbar-item dropdown" ref={cropDropdownRef}>
-              <a href="#" className="navbar-link" onClick={toggleCropDropdown}>
-                Crop Management <i className={`fas fa-chevron-down ${cropDropdownOpen ? "rotate" : ""}`}></i>
-              </a>
-              <ul className={`dropdown-menu ${cropDropdownOpen ? "show" : ""}`}>
-                <li>
-                  <Link to="/crop-management" className="dropdown-link" onClick={() => setMenuOpen(false)}>
-                    Crop Dashboard
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/irrigation-guide" className="dropdown-link" onClick={() => setMenuOpen(false)}>
-                    Irrigation Guide
-                  </Link>
-                </li>
-              </ul>
-            </li>
-          )}
+          {/* Show Crop Management to all users, but only admin can modify */}
+          <li className="navbar-item dropdown" ref={cropDropdownRef}>
+            <a href="#" className="navbar-link" onClick={toggleCropDropdown}>
+              Crop Management <i className={`fas fa-chevron-down ${cropDropdownOpen ? "rotate" : ""}`}></i>
+            </a>
+            <ul className={`dropdown-menu ${cropDropdownOpen ? "show" : ""}`}>
+              <li>
+                <Link to="/crop-management" className="dropdown-link" onClick={() => setMenuOpen(false)}>
+                  Crop Dashboard
+                </Link>
+              </li>
+              <li>
+                <Link to="/irrigation-guide" className="dropdown-link" onClick={() => setMenuOpen(false)}>
+                  Irrigation Guide
+                </Link>
+              </li>
+            </ul>
+          </li>
 
           {/* <li className="navbar-item dropdown" ref={infoDropdownRef}>
             <a href="#" className="navbar-link" onClick={toggleInfoDropdown}>
@@ -117,9 +116,10 @@ const Navbar = () => {
 
           {currentUser ? (
             <>
+              {/* Show appropriate dashboard based on user role */}
               <li className="navbar-item">
                 <Link to={isAdmin ? "/admin" : "/dashboard"} className="navbar-link" onClick={() => setMenuOpen(false)}>
-                  {isAdmin ? "Admin Dashboard" : "Dashboard"}
+                  {isAdmin ? "Admin Dashboard" : "My Dashboard"}
                 </Link>
               </li>
               <li className="navbar-item">
@@ -143,9 +143,9 @@ const Navbar = () => {
             </>
           )}
 
-          <li className="navbar-item search-item">
+          {/* <li className="navbar-item search-item">
             <SearchBar />
-          </li>
+          </li> */}
         </ul>
       </div>
     </nav>

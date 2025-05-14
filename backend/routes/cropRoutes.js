@@ -6,7 +6,11 @@ const { auth, admin } = require("../middleware/auth")
 // Get all crops
 router.get("/", async (req, res) => {
   try {
+    if (process.env.NODE_ENV === "development") {
+      console.log("Fetching all crops");
+    }
     const crops = await Crop.find()
+    console.log(`Found ${crops.length} crops`)
     res.json(crops)
   } catch (err) {
     console.error("Error fetching crops:", err)
@@ -18,19 +22,23 @@ router.get("/", async (req, res) => {
 router.get("/:idOrSlug", async (req, res) => {
   try {
     let crop
+    const idOrSlug = req.params.idOrSlug
+    console.log(`Fetching crop with ID or slug: ${idOrSlug}`)
 
     // Check if the parameter is an ObjectId
-    if (req.params.idOrSlug.match(/^[0-9a-fA-F]{24}$/)) {
-      crop = await Crop.findById(req.params.idOrSlug)
+    if (idOrSlug.match(/^[0-9a-fA-F]{24}$/)) {
+      crop = await Crop.findById(idOrSlug)
     } else {
       // Otherwise, treat it as a slug
-      crop = await Crop.findOne({ slug: req.params.idOrSlug })
+      crop = await Crop.findOne({ slug: idOrSlug })
     }
 
     if (!crop) {
+      console.log(`Crop not found with ID or slug: ${idOrSlug}`)
       return res.status(404).json({ message: "Crop not found" })
     }
 
+    console.log(`Found crop: ${crop.name}`)
     res.json(crop)
   } catch (err) {
     console.error("Error fetching crop:", err)

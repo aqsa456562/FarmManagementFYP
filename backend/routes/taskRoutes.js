@@ -3,15 +3,34 @@ const router = express.Router()
 const Task = require("../models/Task")
 const { auth } = require("../middleware/auth")
 
-// Get all tasks for the current user
+// Get all tasks (admin only)
 router.get("/", async (req, res) => {
   try {
-    // In a real app with proper auth, you would use req.user.id
-    // For now, we'll return all tasks
     const tasks = await Task.find()
     res.json(tasks)
   } catch (err) {
-    console.error("Error fetching tasks:", err)
+    console.error("Error fetching all tasks:", err)
+    res.status(500).json({ message: "Server Error" })
+  }
+})
+
+// Get tasks for a specific user
+router.get("/user/:userId", async (req, res) => {
+  try {
+    const { userId } = req.params
+
+    if (!userId) {
+      return res.status(400).json({ message: "User ID is required" })
+    }
+
+    console.log("Fetching tasks for user:", userId)
+
+    const tasks = await Task.find({ user: userId })
+    console.log("Found tasks:", tasks.length)
+
+    res.json(tasks)
+  } catch (err) {
+    console.error("Error fetching user tasks:", err)
     res.status(500).json({ message: "Server Error" })
   }
 })
@@ -23,12 +42,6 @@ router.get("/:id", async (req, res) => {
     if (!task) {
       return res.status(404).json({ message: "Task not found" })
     }
-
-    // In a real app, verify the task belongs to the current user
-    // if (task.user.toString() !== req.user.id) {
-    //   return res.status(403).json({ message: "Not authorized" })
-    // }
-
     res.json(task)
   } catch (err) {
     console.error("Error fetching task:", err)
@@ -39,14 +52,17 @@ router.get("/:id", async (req, res) => {
 // Create a new task
 router.post("/", async (req, res) => {
   try {
-    // In a real app with proper auth, you would set user: req.user.id
-    // For now, we'll use a placeholder user ID
-    const newTask = new Task({
-      ...req.body,
-      user: "64f5a53e9d312a1f34b5f7e1", // Placeholder user ID
-    })
+    // Ensure user ID is included in the request
+    if (!req.body.user) {
+      return res.status(400).json({ message: "User ID is required" })
+    }
 
+    console.log("Creating new task:", req.body)
+
+    const newTask = new Task(req.body)
     await newTask.save()
+
+    console.log("Created task:", newTask)
     res.status(201).json(newTask)
   } catch (err) {
     console.error("Error creating task:", err)
@@ -61,11 +77,6 @@ router.put("/:id", async (req, res) => {
     if (!task) {
       return res.status(404).json({ message: "Task not found" })
     }
-
-    // In a real app, verify the task belongs to the current user
-    // if (task.user.toString() !== req.user.id) {
-    //   return res.status(403).json({ message: "Not authorized" })
-    // }
 
     // Update task fields
     Object.keys(req.body).forEach((key) => {
@@ -90,11 +101,6 @@ router.delete("/:id", async (req, res) => {
     if (!task) {
       return res.status(404).json({ message: "Task not found" })
     }
-
-    // In a real app, verify the task belongs to the current user
-    // if (task.user.toString() !== req.user.id) {
-    //   return res.status(403).json({ message: "Not authorized" })
-    // }
 
     await Task.deleteOne({ _id: req.params.id })
     res.json({ message: "Task deleted successfully" })

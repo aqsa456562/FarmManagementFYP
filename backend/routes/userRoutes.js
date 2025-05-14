@@ -88,20 +88,25 @@ router.get("/users", async (req, res) => {
   }
 })
 
-// Update user (admin only)
+// Edit user (admin only)
 router.put("/users/:id", async (req, res) => {
   try {
-    const user = await User.findById(req.params.id)
+    const { fullName, email, farmType, location, isAdmin } = req.body;
+
+    const user = await User.findById(req.params.id);
     if (!user) {
-      return res.status(404).json({ message: "User not found" })
+      return res.status(404).json({ message: "User not found" });
     }
 
-    // Update only allowed fields
-    if (req.body.isAdmin !== undefined) {
-      user.isAdmin = req.body.isAdmin
-    }
+    // Update user fields
+    user.fullName = fullName || user.fullName;
+    user.email = email || user.email;
+    user.farmType = farmType || user.farmType;
+    user.location = location || user.location;
+    user.isAdmin = isAdmin;
 
-    await user.save()
+    await user.save();
+
     res.json({
       id: user._id,
       fullName: user.fullName,
@@ -109,12 +114,12 @@ router.put("/users/:id", async (req, res) => {
       farmType: user.farmType,
       location: user.location,
       isAdmin: user.isAdmin,
-    })
+    });
   } catch (err) {
-    console.error("Error updating user:", err)
-    res.status(500).json({ message: "Server Error" })
+    console.error("Error updating user:", err);
+    res.status(500).json({ message: "Server Error" });
   }
-})
+});
 
 // Delete user (admin only)
 router.delete("/users/:id", async (req, res) => {

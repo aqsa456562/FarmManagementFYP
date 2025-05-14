@@ -1,32 +1,48 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useParams, Link } from "react-router-dom"
-import crops from "../data/crops"
+import { useParams, Link, useNavigate } from "react-router-dom"
+import axios from "axios"
+import { useAuth } from "../context/AuthContext"
 import "./CropDetail.css"
+
+const API_URL = "http://localhost:5000/api"
 
 const CropDetail = () => {
   const { slug } = useParams()
   const [crop, setCrop] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+  const { isAdmin } = useAuth()
+  const navigate = useNavigate()
 
   useEffect(() => {
-    // In a real app, you would fetch the crop data from an API
-    // For now, we'll use our local data
-    const fetchCrop = () => {
-      setLoading(true)
+    const fetchCrop = async () => {
+      try {
+        setLoading(true)
+        setError(null)
 
-      // Find crop by slug or id
-      const foundCrop = crops.find((c) => c.slug === slug || c.id.toString() === slug)
+        // Fetch crop by slug or id from the API
+        const response = await axios.get(`${API_URL}/crops/${slug}`)
+        console.log("Fetched crop details:", response.data)
+        setCrop(response.data)
+      } catch (error) {
+        console.error("Error fetching crop:", error)
+        setError("Failed to load crop details. Please try again.")
 
-      if (foundCrop) {
-        setCrop(foundCrop)
+        // For demo purposes, load from local data if API fails
+        import("../data/crops").then((module) => {
+          const foundCrop = module.default.find((c) => c.slug === slug || c.id.toString() === slug)
+          setCrop(foundCrop || null)
+        })
+      } finally {
+        setLoading(false)
       }
-
-      setLoading(false)
     }
 
-    fetchCrop()
+    if (slug) {
+      fetchCrop()
+    }
   }, [slug])
 
   if (loading) {
@@ -38,7 +54,7 @@ const CropDetail = () => {
     )
   }
 
-  if (!crop) {
+  if (error || !crop) {
     return (
       <div className="crop-not-found">
         <h2>Crop Not Found</h2>
@@ -61,6 +77,11 @@ const CropDetail = () => {
         <div className="container">
           <h1 className="crop-detail-title">{crop.name}</h1>
           <p className="crop-detail-subtitle">{crop.scientificName}</p>
+          {isAdmin && (
+            <button className="btn admin-edit-btn" onClick={() => navigate(`/admin/crops/edit/${crop._id || crop.id}`)}>
+              Edit Crop (Admin)
+            </button>
+          )}
         </div>
       </div>
 
@@ -96,8 +117,11 @@ const CropDetail = () => {
                     <strong>Name:</strong> {crop.name}
                   </li>
                   <li>
-                    <strong>Scientific Name:</strong> {crop.scientificName}
+                    <strong>Farmer Name:</strong> {crop.farmerName}
                   </li>
+                  {/* <li>
+                    <strong>Scientific Name:</strong> {crop.scientificName}
+                  </li> */}
                   <li>
                     <strong>Category:</strong> {crop.category.charAt(0).toUpperCase() + crop.category.slice(1)}
                   </li>
@@ -110,10 +134,10 @@ const CropDetail = () => {
                 </ul>
               </div>
 
-              <div className="crop-description-section">
+              {/* <div className="crop-description-section">
                 <h2>Overview</h2>
                 <p>{crop.fullDescription}</p>
-              </div>
+              </div> */}
 
               <div className="crop-cultivation-section">
                 <h2>Cultivation Guide</h2>
@@ -128,21 +152,21 @@ const CropDetail = () => {
                   <p>{crop.care}</p>
                 </div>
 
-                <div className="cultivation-step">
+                {/* <div className="cultivation-step">
                   <h3>Harvesting</h3>
                   <p>{crop.harvesting}</p>
-                </div>
-
+                </div> */}
+{/* 
                 <div className="cultivation-step">
                   <h3>Pests & Diseases</h3>
                   <p>{crop.pests}</p>
-                </div>
+                </div> */}
               </div>
             </div>
           </div>
 
           <div className="crop-detail-sidebar">
-            <div className="sidebar-card">
+            {/* <div className="sidebar-card">
               <h3>Related Resources</h3>
               <ul className="resource-links">
                 <li>
@@ -166,7 +190,7 @@ const CropDetail = () => {
                   </a>
                 </li>
               </ul>
-            </div>
+            </div> */}
 
             <div className="sidebar-card">
               <h3>Expert Advice</h3>
@@ -175,6 +199,34 @@ const CropDetail = () => {
                 Contact Our Experts
               </Link>
             </div>
+
+            {isAdmin && (
+              <div className="sidebar-card admin-actions">
+                <h3>Admin Actions</h3>
+                <button className="btn admin-btn" onClick={() => navigate(`/admin/crops/edit/${crop._id || crop.id}`)}>
+                  Edit Crop Details
+                </button>
+                <button
+                  className="btn admin-delete-btn"
+                  onClick={() => {
+                    if (window.confirm("Are you sure you want to delete this crop? This action cannot be undone.")) {
+                      axios
+                        .delete(`${API_URL}/crops/${crop._id || crop.id}`)
+                        .then(() => {
+                          alert("Crop deleted successfully")
+                          navigate("/crop-management")
+                        })
+                        .catch((err) => {
+                          console.error("Error deleting crop:", err)
+                          alert("Failed to delete crop")
+                        })
+                    }
+                  }}
+                >
+                  Delete Crop
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>

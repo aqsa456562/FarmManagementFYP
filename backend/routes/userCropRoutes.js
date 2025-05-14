@@ -3,12 +3,31 @@ const router = express.Router()
 const UserCrop = require("../models/UserCrop")
 const { auth } = require("../middleware/auth")
 
-// Get all user crops for the current user
+// Get all user crops (admin only)
 router.get("/", async (req, res) => {
   try {
-    // In a real app with proper auth, you would use req.user.id
-    // For now, we'll return all crops
     const userCrops = await UserCrop.find()
+    res.json(userCrops)
+  } catch (err) {
+    console.error("Error fetching all user crops:", err)
+    res.status(500).json({ message: "Server Error" })
+  }
+})
+
+// Get user crops for a specific user
+router.get("/user/:userId", async (req, res) => {
+  try {
+    const { userId } = req.params
+
+    if (!userId) {
+      return res.status(400).json({ message: "User ID is required" })
+    }
+
+    console.log("Fetching crops for user:", userId)
+
+    const userCrops = await UserCrop.find({ user: userId })
+    console.log("Found crops:", userCrops.length)
+
     res.json(userCrops)
   } catch (err) {
     console.error("Error fetching user crops:", err)
@@ -23,12 +42,6 @@ router.get("/:id", async (req, res) => {
     if (!crop) {
       return res.status(404).json({ message: "Crop not found" })
     }
-
-    // In a real app, verify the crop belongs to the current user
-    // if (crop.user.toString() !== req.user.id) {
-    //   return res.status(403).json({ message: "Not authorized" })
-    // }
-
     res.json(crop)
   } catch (err) {
     console.error("Error fetching user crop:", err)
@@ -39,14 +52,17 @@ router.get("/:id", async (req, res) => {
 // Create a new user crop
 router.post("/", async (req, res) => {
   try {
-    // In a real app with proper auth, you would set user: req.user.id
-    // For now, we'll use a placeholder user ID
-    const newCrop = new UserCrop({
-      ...req.body,
-      user: "64f5a53e9d312a1f34b5f7e1", // Placeholder user ID
-    })
+    // Ensure user ID is included in the request
+    if (!req.body.user) {
+      return res.status(400).json({ message: "User ID is required" })
+    }
 
+    console.log("Creating new user crop:", req.body)
+
+    const newCrop = new UserCrop(req.body)
     await newCrop.save()
+
+    console.log("Created crop:", newCrop)
     res.status(201).json(newCrop)
   } catch (err) {
     console.error("Error creating user crop:", err)
@@ -61,11 +77,6 @@ router.put("/:id", async (req, res) => {
     if (!crop) {
       return res.status(404).json({ message: "Crop not found" })
     }
-
-    // In a real app, verify the crop belongs to the current user
-    // if (crop.user.toString() !== req.user.id) {
-    //   return res.status(403).json({ message: "Not authorized" })
-    // }
 
     // Update crop fields
     Object.keys(req.body).forEach((key) => {
@@ -90,11 +101,6 @@ router.delete("/:id", async (req, res) => {
     if (!crop) {
       return res.status(404).json({ message: "Crop not found" })
     }
-
-    // In a real app, verify the crop belongs to the current user
-    // if (crop.user.toString() !== req.user.id) {
-    //   return res.status(403).json({ message: "Not authorized" })
-    // }
 
     await UserCrop.deleteOne({ _id: req.params.id })
     res.json({ message: "Crop deleted successfully" })

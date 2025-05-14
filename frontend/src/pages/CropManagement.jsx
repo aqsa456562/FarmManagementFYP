@@ -1,12 +1,21 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useNavigate } from "react-router-dom"
+import axios from "axios"
 import CropCard from "../components/CropCard"
-import crops from "../data/crops"
+import { useAuth } from "../context/AuthContext"
 import "./CropManagement.css"
+
+const API_URL = "http://localhost:5000/api"
 
 const CropManagement = () => {
   const [activeCategory, setActiveCategory] = useState("all")
+  const [crops, setCrops] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+  const { isAdmin, getAuthHeaders } = useAuth()
+  const navigate = useNavigate()
 
   const categories = [
     { id: "all", name: "All Crops" },
@@ -16,9 +25,47 @@ const CropManagement = () => {
     { id: "legume", name: "Legumes" },
     { id: "fiber", name: "Fiber Crops" },
     { id: "cash", name: "Cash Crops" },
+    { id: "hello", name: "hello " },
   ]
 
+  useEffect(() => {
+    fetchCrops()
+  }, [])
+
+  const fetchCrops = async () => {
+    try {
+      setLoading(true)
+      setError(null)
+
+      // Fetch crops from the API - same endpoint used by admin
+      const response = await axios.get(`${API_URL}/crops`, {
+        headers: getAuthHeaders(),
+      })
+      console.log("Fetched crops:", response.data)
+      setCrops(response.data || [])
+    } catch (error) {
+      console.error("Error fetching crops:", error)
+      setError("Failed to load crops. Please try again.")
+
+      // For demo purposes, load from local data if API fails
+      import("../data/crops").then((module) => {
+        setCrops(module.default)
+      })
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // Filter crops by category
   const filteredCrops = activeCategory === "all" ? crops : crops.filter((crop) => crop.category === activeCategory)
+
+  if (loading) {
+    return <div className="loading">Loading crops...</div>
+  }
+
+  if (error) {
+    return <div className="error-message">{error}</div>
+  }
 
   return (
     <div className="crop-management-page">
@@ -28,6 +75,11 @@ const CropManagement = () => {
           <p className="crop-hero-subtitle">
             Comprehensive guides and information on various crops to help you maximize your yield and quality.
           </p>
+          {isAdmin && (
+            <button className="btn admin-crop-btn" onClick={() => navigate("/admin/crops/add")}>
+              Add New Crop (Admin)
+            </button>
+          )}
         </div>
       </div>
 
@@ -44,23 +96,30 @@ const CropManagement = () => {
           ))}
         </div>
 
-        <div className="crops-grid">
-          {filteredCrops.map((crop) => (
-            <CropCard
-              key={crop.id}
-              id={crop.id}
-              slug={crop.slug}
-              image={crop.images?.[0] || crop.image}
-              name={crop.name}
-              season={crop.season}
-              duration={crop.duration}
-              description={crop.description}
-            />
-          ))}
-        </div>
-
-        {filteredCrops.length === 0 && (
-          <div className="no-crops-message">No crops found in this category. Please try another category.</div>
+        {filteredCrops.length === 0 ? (
+          <div className="no-crops-message">
+            <p>No crops found in this category. Please try another category.</p>
+            {isAdmin && (
+              <button className="btn" onClick={() => navigate("/admin/crops/add")}>
+                Add New Crop
+              </button>
+            )}
+          </div>
+        ) : (
+          <div className="crops-grid">
+            {filteredCrops.map((crop) => (
+              <CropCard
+                key={crop._id || crop.id}
+                id={crop._id || crop.id}
+                slug={crop.slug}
+                image={crop.images?.[0] || crop.image}
+                name={crop.name}
+                season={crop.season}
+                duration={crop.duration}
+                description={crop.description}
+              />
+            ))}
+          </div>
         )}
       </div>
 

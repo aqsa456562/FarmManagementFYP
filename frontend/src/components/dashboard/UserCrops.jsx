@@ -13,19 +13,28 @@ const UserCrops = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const navigate = useNavigate()
-  const { currentUser } = useAuth()
+  const { currentUser, getAuthHeaders } = useAuth()
 
   useEffect(() => {
-    fetchUserCrops()
-  }, [])
+    if (currentUser) {
+      fetchUserCrops()
+    }
+  }, [currentUser])
 
   const fetchUserCrops = async () => {
     try {
       setLoading(true)
-      // Fetch user crops from the API latest data from backend
-      const response = await axios.get(`${API_URL}/user-crops`)
-      setUserCrops(response.data || [])
       setError(null)
+
+      console.log("Fetching crops for user:", currentUser.id || currentUser._id)
+
+      // Fetch user-specific crops from the API
+      const response = await axios.get(`${API_URL}/user-crops/user/${currentUser.id || currentUser._id}`, {
+        headers: getAuthHeaders(),
+      })
+
+      console.log("User crops response:", response.data)
+      setUserCrops(response.data || [])
     } catch (error) {
       console.error("Error fetching user crops:", error)
       setError("Failed to load your crops. Please try again.")
@@ -42,7 +51,9 @@ const UserCrops = () => {
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this crop?")) {
       try {
-        await axios.delete(`${API_URL}/user-crops/${id}`)
+        await axios.delete(`${API_URL}/user-crops/${id}`, {
+          headers: getAuthHeaders(),
+        })
         setUserCrops(userCrops.filter((crop) => crop._id !== id))
       } catch (error) {
         console.error("Error deleting crop:", error)
@@ -53,8 +64,20 @@ const UserCrops = () => {
 
   const handleAddCrop = async (cropData) => {
     try {
-      // craete new crop in the backend
-      const response = await axios.post(`${API_URL}/user-crops`, cropData)
+      // Add user ID to the crop data
+      const cropWithUserId = {
+        ...cropData,
+        user: currentUser.id || currentUser._id,
+      }
+
+      console.log("Adding crop with user ID:", cropWithUserId)
+
+      // Create new crop in the backend
+      const response = await axios.post(`${API_URL}/user-crops`, cropWithUserId, {
+        headers: getAuthHeaders(),
+      })
+
+      console.log("Add crop response:", response.data)
       setUserCrops([...userCrops, response.data])
       navigate("/dashboard/crops")
     } catch (error) {
@@ -65,8 +88,10 @@ const UserCrops = () => {
 
   const handleUpdateCrop = async (id, cropData) => {
     try {
-      // update crop in the backend
-      const response = await axios.put(`${API_URL}/user-crops/${id}`, cropData)
+      // Update crop in the backend
+      const response = await axios.put(`${API_URL}/user-crops/${id}`, cropData, {
+        headers: getAuthHeaders(),
+      })
       setUserCrops(userCrops.map((crop) => (crop._id === id ? response.data : crop)))
       navigate("/dashboard/crops")
     } catch (error) {
@@ -109,8 +134,8 @@ const UserCrops = () => {
                   <th>Area</th>
                   <th>Planting Date</th>
                   <th>Expected Harvest</th>
-                  <th>Season</th> {/* change 3 */}
-                  <th>Water Level</th> {/* change 4 */}
+                  <th>Season</th>
+                  <th>Water Level</th>
                   <th>Status</th>
                   <th>Actions</th>
                 </tr>
@@ -122,9 +147,8 @@ const UserCrops = () => {
                     <td>{crop.area}</td>
                     <td>{crop.plantingDate}</td>
                     <td>{crop.harvestDate}</td>
-                    <td>{crop.season}</td> {/* change 5 */}
-                    <td>{crop.waterLevel}</td> {/* change 6 */}
-                    {/* change 7 */}
+                    <td>{crop.season}</td>
+                    <td>{crop.waterLevel}</td>
                     <td>
                       <span className={`status-badge ${crop.status.toLowerCase()}`}>{crop.status}</span>
                     </td>

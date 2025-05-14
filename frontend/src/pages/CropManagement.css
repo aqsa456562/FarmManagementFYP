@@ -1,5 +1,5 @@
 .crop-hero {
-  background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url("/crop-management-hero.jpg");
+  background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url("https://www.shutterstock.com/image-photo/ripe-carrots-growing-on-field-600nw-1510392164.jpg");
   background-size: cover;
   background-position: center;
   color: white;
@@ -19,12 +19,22 @@
   line-height: 1.6;
 }
 
+.admin-crop-btn {
+  margin-top: 20px;
+  background-color: #ff9800;
+  color: white;
+}
+
+.admin-crop-btn:hover {
+  background-color: #f57c00;
+}
+
 .crop-categories {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: wrap; /* Allows buttons to wrap to the next line on smaller screens */
   gap: 10px;
   margin-bottom: 40px;
-  justify-content: center;
+  justify-content: flex-start; /* Centers the buttons horizontally */
 }
 
 .category-btn {
@@ -34,6 +44,10 @@
   border-radius: 4px;
   cursor: pointer;
   transition: all 0.3s ease;
+  width: auto;
+  display: block;
+  text-align: left;
+  margin: 5px 0;
 }
 
 .category-btn.active {
@@ -82,6 +96,17 @@
   box-shadow: var(--box-shadow);
 }
 
+.loading,
+.error-message {
+  text-align: center;
+  padding: 40px;
+  font-size: 1.2rem;
+}
+
+.error-message {
+  color: var(--error-color);
+}
+
 @media (max-width: 768px) {
   .crop-management-content {
     grid-template-columns: 1fr;
@@ -93,7 +118,8 @@
 
   .crop-categories {
     flex-direction: column;
-    align-items: center;
+    display: flex;
+    align-items: stretch;
   }
 
   .category-btn {

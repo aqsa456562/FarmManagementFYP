@@ -12,11 +12,20 @@ export const useAuth = () => useContext(AuthContext)
 export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [authToken, setAuthToken] = useState(null)
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user")
+    const storedToken = localStorage.getItem("authToken")
+
     if (storedUser) {
       setCurrentUser(JSON.parse(storedUser))
+      setAuthToken(storedToken)
+
+      // Set default auth header for all requests
+      if (storedToken) {
+        axios.defaults.headers.common["Authorization"] = `Bearer ${storedToken}`
+      }
     }
     setLoading(false)
   }, [])
@@ -27,8 +36,23 @@ export const AuthProvider = ({ children }) => {
 
       if (response.data.success) {
         const userData = response.data.user
-        setCurrentUser(userData)
-        localStorage.setItem("user", JSON.stringify(userData))
+        const token = response.data.token || "dummy-token" // In case backend doesn't provide token yet
+
+        // Ensure user has an ID property
+        const userWithId = {
+          ...userData,
+          id: userData._id || userData.id,
+        }
+
+        setCurrentUser(userWithId)
+        setAuthToken(token)
+
+        localStorage.setItem("user", JSON.stringify(userWithId))
+        localStorage.setItem("authToken", token)
+
+        // Set auth header for future requests
+        axios.defaults.headers.common["Authorization"] = `Bearer ${token}`
+
         return true
       }
       return false
@@ -43,9 +67,7 @@ export const AuthProvider = ({ children }) => {
       const response = await axios.post(`${API_URL}/auth/register`, userData)
 
       if (response.data.success) {
-        // const newUser = response.data.user    // change 1
-        // setCurrentUser(newUser) 
-        // localStorage.setItem("user", JSON.stringify(newUser))
+        // We don't auto-login after registration now
         return true
       }
       return false
@@ -57,16 +79,30 @@ export const AuthProvider = ({ children }) => {
 
   const logout = () => {
     setCurrentUser(null)
+    setAuthToken(null)
     localStorage.removeItem("user")
+    localStorage.removeItem("authToken")
+    // Remove auth header
+    delete axios.defaults.headers.common["Authorization"]
+  }
+
+  const getAuthHeaders = () => {
+    const token = localStorage.getItem("authToken")
+    return {
+      "Content-Type": "application/json",
+      Authorization: token ? `Bearer ${token}` : "",
+    }
   }
 
   const value = {
     currentUser,
+    authToken,
     login,
     register,
     logout,
     loading,
     isAdmin: currentUser?.isAdmin || false,
+    getAuthHeaders,
   }
 
   return <AuthContext.Provider value={value}>{!loading && children}</AuthContext.Provider>
